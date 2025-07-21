@@ -1,0 +1,22 @@
+{
+  "name": "real-time-fraud-detection",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "express-validators": "^1.0.4",
+    "jsonwebtoken": "^9.0.2",
+    "kafka-node": "^5.0.0",
+    "mongoose": "^8.16.4",
+    "nodemon": "^3.1.10",
+    "socket.io": "^4.8.1"
+  }
+}
