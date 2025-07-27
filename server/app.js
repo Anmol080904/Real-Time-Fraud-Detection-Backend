@@ -3,6 +3,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const transactionRoute = require('./routes/transactionroute');
+const { consumeMessages } = require('../broker/consumer');
 
 // Load env variables
 dotenv.config();
@@ -22,7 +24,8 @@ const userRoutes = require('./routes/userroutes');
 const transactionRoutes = require('./routes/transactionroutes');
 
 app.use('/api/users', userRoutes);
-app.use('/api/transactions', transactionRoutes);
+
+app.use('/api/transaction', transactionRoute);
 
 // Root health check
 app.get('/', (req, res) => {
