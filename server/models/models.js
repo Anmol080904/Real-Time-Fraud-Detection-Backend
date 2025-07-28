@@ -1,11 +1,15 @@
-const mongoose=require("mongoose");
-const userSchema=new mongoose.Schema({
-    username:{type: String,required:true, unique:true},
-    firstname:{type:String,requires:true,unique:false},
-    password:{type:String,required:true},
-    role:{type:String,enum:["admin","user"],default:"user"}
-})
-const transSchema=new mongoose.Schema({
+const mongoose = require("mongoose");
+
+// User Schema
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  firstname: { type: String, required: true, unique: false },
+  password: { type: String, required: true },
+  role: { type: String, enum: ["admin", "user"], default: "user" }
+});
+
+// Transaction Schema
+const transSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   amount: { type: Number, required: true },
   currency: { type: String, default: "USD" },
@@ -16,6 +20,8 @@ const transSchema=new mongoose.Schema({
   fraudScore: { type: Number, default: 0.0 },
   isFraud: { type: Boolean, default: false },
 }, { timestamps: true });
+
+// Fraud Alert Schema
 const fraudAlertSchema = new mongoose.Schema({
   transactionId: { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
   flaggedBy: { type: String, enum: ["model", "admin"], default: "model" },
@@ -24,11 +30,13 @@ const fraudAlertSchema = new mongoose.Schema({
   reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
-const User=new mongoose.model(userSchema);
-const Transaction=new mongoose.model(transSchema);
-const Fraud=new mongoose.model(fraudAlertSchema)
-module.exports={
-    User,
-    Transaction,
-    Fraud
-}
+// ✅ Register Models with Names
+const User = mongoose.model("User", userSchema);
+const Transaction = mongoose.model("Transaction", transSchema);
+const Fraud = mongoose.model("FraudAlert", fraudAlertSchema);
+
+module.exports = {
+  User,
+  Transaction,
+  Fraud
+};

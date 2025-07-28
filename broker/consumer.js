@@ -1,5 +1,5 @@
 const { Kafka } = require('kafkajs');
-const { detectFraud } = require('fraudDetectionServicejs');
+const { detectFraud } = require('../broker/fraudDetectionService');
 
 const kafka = new Kafka({
   clientId: 'fraud-consumer',
