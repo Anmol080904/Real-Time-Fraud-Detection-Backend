@@ -12,3 +12,5 @@ router.get('/transactions', getAllTransactions);
 
 // Block transaction by ID
 router.put('/transaction/block/:id', blockTransaction);
+
+module.exports = router;

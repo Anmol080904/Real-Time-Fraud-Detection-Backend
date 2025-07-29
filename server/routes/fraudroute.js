@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { analyzeTransaction } = require('../controllers/fraudcontroller');
+const { updateFraudScore } = require('../controllers/fraudcontroller');
 const { verifyToken } = require('../middleware/authmiddleware');
 
-router.post('/analyze', verifyToken, analyzeTransaction);
+router.post('/analyze', verifyToken, updateFraudScore);
 
 module.exports = router;
