@@ -8,11 +8,17 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 
 const sendToKafka = async (topic, message) => {
-  await producer.connect();
-  await producer.send({
-    topic,
-    messages: [{ value: JSON.stringify(message) }],
-  });
+  try {
+    await producer.connect();
+    await producer.send({
+      topic,
+      messages: [{ value: JSON.stringify(message) }],
+    });
+  } catch (error) {
+    console.error('Kafka Producer Error:', error);
+  } finally {
+    await producer.disconnect();
+  }
 };
 
 module.exports = { sendToKafka };
