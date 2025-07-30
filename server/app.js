@@ -32,7 +32,6 @@ app.get('/', (req, res) => {
   res.send('🚀 Fraud Detection Backend API Running...');
 });
 
-// Error handling middleware (should be last)
 app.use(errorMiddleware);
 
 module.exports = app;
