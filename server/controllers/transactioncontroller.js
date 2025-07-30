@@ -1,45 +1,32 @@
+const Transaction = require("../models/Transaction");
+const { sendToKafka } = require("../kafka/producer");
 
-const asyncHandler = require('../utils/asyncHandler');
-const { sendToKafka } = require('../services/kafkaproducer');
-const { Transaction, Fraud } = require('../models/models');
+exports.createTransaction = async (req, res, next) => {
+  try {
+    const { amount, merchant, location } = req.body;
+    const newTx = new Transaction({
+      userId: req.user.id,
+      amount,
+      merchant,
+      location,
+    });
 
-exports.createTransaction = asyncHandler(async (req, res) => {
-  const tx = await Transaction.create(req.body);
-  
-  // Send transaction to Kafka topic for fraud analysis
-  await sendToKafka('transactions', tx);
+    const savedTx = await newTx.save();
 
-  res.status(201).json(tx);
-});
+    // Send transaction to Kafka for fraud scoring
+    await sendToKafka("transactions", savedTx);
 
-exports.getAllTransactions = asyncHandler(async (req, res) => {
-  const txs = await Transaction.find().sort({ createdAt: -1 });
-  res.status(200).json(txs);
-});
-
-exports.blockTransaction = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { reason = "Suspicious activity", flaggedBy = "admin", reviewedBy } = req.body;
-
-  // Update the transaction
-  const updatedTx = await Transaction.findByIdAndUpdate(
-    id,
-    { status: "blocked", isFraud: true, fraudScore: 1.0 },
-    { new: true }
-  );
-
-  if (!updatedTx) {
-    return res.status(404).json({ message: "Transaction not found" });
+    res.status(201).json({ message: "Transaction created and sent to Kafka", data: savedTx });
+  } catch (err) {
+    next(err);
   }
+};
 
-  // Create a fraud alert record
-  const fraudRecord = await Fraud.create({
-    transactionId: updatedTx._id,
-    flaggedBy,
-    reason,
-    actionTaken: "blocked",
-    reviewedBy
-  });
-
-  res.status(200).json({ message: "Transaction blocked and flagged", transaction: updatedTx, fraudRecord });
-});
+exports.getUserTransactions = async (req, res, next) => {
+  try {
+    const transactions = await Transaction.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json({ data: transactions });
+  } catch (err) {
+    next(err);
+  }
+};

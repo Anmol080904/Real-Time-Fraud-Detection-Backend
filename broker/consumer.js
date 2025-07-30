@@ -1,23 +1,24 @@
-const { Kafka } = require('kafkajs');
-const { detectFraud } = require('../broker/fraudDetectionService');
+const { Kafka } = require("kafkajs");
+const { analyzeTransaction } = require("../controllers/fraudDetectionController");
 
 const kafka = new Kafka({
-  clientId: 'fraud-consumer',
-  brokers: ['localhost:9092']
+  clientId: "fraud-detector",
+  brokers: ["localhost:9092"],
 });
 
-const consumer = kafka.consumer({ groupId: 'fraud-group' });
+const consumer = kafka.consumer({ groupId: "fraud-analysis-group" });
 
-const consumeMessages = async () => {
+const runConsumer = async () => {
   await consumer.connect();
-  await consumer.subscribe({ topic: 'test-topic', fromBeginning: true });
+  await consumer.subscribe({ topic: "transactions", fromBeginning: false });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      const data = JSON.parse(message.value.toString());
-      detectFraud(data); // handle with your AI model
+      await analyzeTransaction(message);
     },
   });
+
+  console.log("🧠 Kafka fraud detection consumer running...");
 };
 
-module.exports = { consumeMessages };
+module.exports = runConsumer;
