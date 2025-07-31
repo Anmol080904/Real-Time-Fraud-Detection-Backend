@@ -1,11 +1,24 @@
-const mongoose = require("mongoose");
+'use strict';
+const { Model } = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class FraudAlert extends Model {
+    static associate(models) {
+      FraudAlert.belongsTo(models.Transaction, {
+        foreignKey: 'transactionId',
+        as: 'transaction',
+        onDelete: 'CASCADE'
+      });
+    }
+  }
 
-const fraudAlertSchema = new mongoose.Schema({
-  transactionId: { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
-  flaggedBy: { type: String, enum: ["model", "admin"], default: "model" },
-  reason: String,
-  actionTaken: { type: String, enum: ["blocked", "investigating", "allowed"], default: "investigating" },
-  reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
-}, { timestamps: true });
+  FraudAlert.init({
+    transactionId: DataTypes.INTEGER,
+    reason: DataTypes.STRING,
+    score: DataTypes.FLOAT
+  }, {
+    sequelize,
+    modelName: 'FraudAlert',
+  });
 
-module.exports = mongoose.model("FraudAlert", fraudAlertSchema);
+  return FraudAlert;
+};

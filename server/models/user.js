@@ -1,10 +1,21 @@
-const mongoose = require("mongoose");
-
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  firstname: { type: String, required: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ["admin", "user"], default: "user" }
-});
-
-module.exports = mongoose.model("User", userSchema);
+'use strict';
+const { Model } = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    static associate(models) {
+      User.hasMany(models.Transaction, {
+        foreignKey: 'userId',
+        as: 'transactions'
+      });
+    }
+  }
+  User.init({
+    name: DataTypes.STRING,
+    email: DataTypes.STRING,
+    password: DataTypes.STRING
+  }, {
+    sequelize,
+    modelName: 'User',
+  });
+  return User;
+};
